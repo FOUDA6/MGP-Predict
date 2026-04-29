@@ -1,6 +1,5 @@
 """
 MGP-Predict — FastAPI Application
-Main entry point for the backend server.
 """
 
 import os
@@ -15,26 +14,30 @@ from routes import router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Create tables on startup."""
     Base.metadata.create_all(bind=engine)
     yield
 
 
 app = FastAPI(
     title="MGP-Predict API",
-    description="API de prédiction de la Moyenne Générale Pondérée (MGP) — INF 232",
+    description="API de prédiction de la MGP — INF 232",
     version="1.0.0",
     lifespan=lifespan,
 )
 
-# CORS — allow frontend URL from env var (Vercel) + localhost for dev
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+# CORS — accepte tous les domaines Vercel + localhost
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "")
 
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    FRONTEND_URL,
+    "https://mgp-predictions.vercel.app",
+    "https://mgp-prediction.vercel.app",
 ]
+
+# Ajoute dynamiquement l'URL depuis la variable d'env si elle est définie
+if FRONTEND_URL and FRONTEND_URL not in allowed_origins:
+    allowed_origins.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +47,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount routes
 app.include_router(router)
 
 
