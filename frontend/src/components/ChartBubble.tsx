@@ -2,6 +2,7 @@
 
 import { Bubble } from "react-chartjs-2";
 import "@/lib/chartSetup";
+import type { TooltipItem } from "chart.js";
 import type { ScatterPoint } from "@/lib/api";
 
 interface Props {
@@ -24,7 +25,7 @@ export default function ChartBubble({ points, sweetSpot }: Props) {
           r: Math.max(3, p.mgp * 4),
         })),
         backgroundColor: points.map((p) => {
-          const hue = (p.mgp / 4) * 120; // 0=red, 120=green
+          const hue = (p.mgp / 4) * 120;
           return `hsla(${hue}, 70%, 50%, 0.5)`;
         }),
         borderColor: points.map((p) => {
@@ -33,7 +34,6 @@ export default function ChartBubble({ points, sweetSpot }: Props) {
         }),
         borderWidth: 1,
       },
-      // Sweet spot marker
       ...(sweetSpot
         ? [
             {
@@ -80,8 +80,8 @@ export default function ChartBubble({ points, sweetSpot }: Props) {
         titleFont: { family: "Inter", weight: "bold" as const },
         bodyFont: { family: "Inter" },
         callbacks: {
-          label: (ctx: { parsed: { x: number; y: number }; raw: { r: number } }) =>
-            `Sommeil: ${ctx.parsed.x}h, Étude: ${ctx.parsed.y}h`,
+          label: (ctx: TooltipItem<"bubble">) =>
+            `Sommeil: ${ctx.parsed.x ?? 0}h, Étude: ${ctx.parsed.y ?? 0}h`,
         },
       },
     },
